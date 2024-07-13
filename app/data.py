@@ -3,7 +3,8 @@ NavBarItems = [
     {"name": "hobbies", "link": "/hobbies"},
     {"name": "projects", "link": "/projects"},
     {"name": "experience", "link": "/experience"},
-    {"name": "map", "link": "/map"}
+    {"name": "map", "link": "/map"},
+    {"name": "timeline", "link": "/timeline"}
 ]
 
 FooterItems = [

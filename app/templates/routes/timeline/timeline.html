@@ -1,0 +1,109 @@
+{% extends 'routes/base.html' %} 
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        form div {
+            margin-bottom: 10px;
+        }
+        .post {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .post img {
+            float: left;
+            margin-right: 10px;
+        }
+        .post-content {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <h1>Timeline</h1>
+    <form id="timeline-form">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="content">Content:</label>
+            <textarea id="content" name="content" required></textarea>
+        </div>
+        <button type="submit">Post</button>
+    </form>
+    <div id="timeline-posts"></div>
+
+    <script>
+        async function fetchPosts() {
+            const response = await fetch('/api/timeline_post');
+            const data = await response.json();
+            return data.timeline_posts;
+        }
+
+        function createGravatarUrl(email) {
+            const hash = md5(email.trim().toLowerCase());
+            return `https://www.gravatar.com/avatar/${hash}`;
+        }
+
+        function renderPosts(posts) {
+            const postsContainer = document.getElementById('timeline-posts');
+            postsContainer.innerHTML = '';
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.innerHTML = `
+                    <img src="${createGravatarUrl(post.email)}" alt="${post.name}'s profile picture" width="50" height="50">
+                    <div class="post-content">
+                        <strong>${post.name}</strong> (${post.email})<br>
+                        <p>${post.content}</p>
+                        <small>${new Date(post.created_at).toLocaleString()}</small>
+                    </div>
+                `;
+                postsContainer.appendChild(postElement);
+            });
+        }
+
+        document.getElementById('timeline-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch('/api/timeline_post', {
+                method: 'POST',
+                body: formData
+            });
+            const newPost = await response.json();
+            const posts = await fetchPosts();
+            renderPosts(posts);
+            this.reset();
+        });
+
+        async function init() {
+            const posts = await fetchPosts();
+            renderPosts(posts);
+        }
+
+        init();
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.18.0/js/md5.min.js"></script>
+</body>
+</html>
+{% endblock %}

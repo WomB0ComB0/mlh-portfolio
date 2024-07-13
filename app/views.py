@@ -31,3 +31,7 @@ def experience():
 @views.route('/map')
 def map():
     return render_template('routes/map/map.html', navbar=data.NavBarItems, footer=data.FooterItems)
+
+@views.route('/timeline')
+def timeline():
+    return render_template('routes/timeline/timeline.html')
